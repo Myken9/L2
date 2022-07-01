@@ -7,12 +7,12 @@ import (
 )
 
 func main() {
-	fmt.Println(unpack("qwe\\45"))
+	fmt.Println(Unpack("qwe\\45"))
 }
 
-func unpack(s string) (str string, err error) {
+func Unpack(s string) (str string, err error) {
 	if s == "" {
-		return str, nil
+		return
 	}
 	if s[0] < 97 || s[0] > 122 {
 		return str, fmt.Errorf("incorrent string")
