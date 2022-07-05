@@ -16,7 +16,6 @@ func UniqLower(in []string) []string {
 			u[i] = true
 		}
 	}
-
 	return res
 }
 
@@ -37,7 +36,6 @@ func AnagramDict(in []string) map[string][]string {
 
 		word := string(sorted)
 		buff[word] = append(buff[word], i)
-
 	}
 
 	res := make(map[string][]string)
