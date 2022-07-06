@@ -5,51 +5,73 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"log"
 	"net"
 	"os"
+	"regexp"
+	"strconv"
 	"time"
 )
 
-func main() {
+var timeout string
 
-	timeOut := flag.Int("timeout", 10, "Time out flag")
+func init() {
+	flag.StringVar(&timeout, "timeout", "10s", "time limit to establish connection")
 	flag.Parse()
-	if len(os.Args) < 4 {
-		fmt.Println("Not enough arguments.\nUSE : -timeout <timeout> <host> <port>")
-		return
+}
+
+func main() {
+	re := regexp.MustCompile(`\ds`)
+	if !re.MatchString(timeout) {
+		log.Fatal("invalid timeout format: " + timeout)
 	}
 
-	conn, err := net.DialTimeout("tcp", os.Args[3]+":"+os.Args[4], time.Duration(*timeOut)*time.Second)
+	if len(flag.Args()) < 2 {
+		log.Fatal("usage: --timeout=1s host port")
+	}
+
+	host := flag.Arg(0)
+	port := flag.Arg(1)
+	toInt, _ := strconv.Atoi(timeout[:len(timeout)-1])
+	to := time.Duration(toInt) * time.Second
+
+	var conn net.Conn
+	var err error
+
+	start := time.Now()
+	for time.Since(start) < to {
+		conn, err = net.Dial("tcp", host+":"+port)
+		if err == nil {
+			break
+		}
+	}
 	if err != nil {
-		time.After(time.Duration(*timeOut) * time.Second)
-		fmt.Println("Wrong server ip")
-		return
+		log.Fatalf("unable to establish connection after timeout: %v", to)
 	}
-
-	if conn != nil {
-		defer conn.Close()
-		fmt.Println("Client Opened")
-	}
+	defer conn.Close()
+	log.Printf("connected to %s:%s", host, port)
 
 	go func() {
+		reader := bufio.NewReader(conn)
 		for {
-			reader := bufio.NewReader(os.Stdin)
-			text, err := reader.ReadString('\n')
+			message, err := reader.ReadString('\n')
 			if err == io.EOF {
-				conn.Close()
+				return
 			}
-
-			fmt.Fprint(conn, text+"\n")
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+			fmt.Print("Message from server: " + message)
 		}
 	}()
 
-	for {
-		mes, err := bufio.NewReader(conn).ReadString('\n')
+	scanner := bufio.NewScanner(os.Stdin)
+	for scanner.Scan() {
+		in := scanner.Text()
+		_, err := fmt.Fprintf(conn, in+"\n")
 		if err != nil {
-			fmt.Println(err)
-			break
+			log.Fatal("connection closed")
 		}
-
-		fmt.Println("Client: " + mes)
 	}
 }
