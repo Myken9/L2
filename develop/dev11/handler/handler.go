@@ -15,7 +15,7 @@ func NewStoreServer(store *service.StoreServer) *StoreServer {
 }
 
 func (ss *StoreServer) HandlerCreateEvent(w http.ResponseWriter, r *http.Request) {
-	_, date, mes, err := HandlerDataPost(r)
+	_, date, mes, err := handlerDataPost(r)
 	if err != nil {
 		http.Error(w, err.Error(), 400)
 		return
@@ -26,7 +26,7 @@ func (ss *StoreServer) HandlerCreateEvent(w http.ResponseWriter, r *http.Request
 }
 
 func (ss *StoreServer) HandlerUpdateEvent(w http.ResponseWriter, r *http.Request) {
-	id, date, mes, err := HandlerDataPost(r)
+	id, date, mes, err := handlerDataPost(r)
 	if err != nil {
 		http.Error(w, err.Error(), 400)
 		return
@@ -42,7 +42,7 @@ func (ss *StoreServer) HandlerUpdateEvent(w http.ResponseWriter, r *http.Request
 }
 
 func (ss *StoreServer) HandlerDeleteEvent(w http.ResponseWriter, r *http.Request) {
-	id, _, _, err := HandlerDataPost(r)
+	id, _, _, err := handlerDataPost(r)
 	if err != nil {
 		http.Error(w, err.Error(), 400)
 		return
@@ -59,7 +59,7 @@ func (ss *StoreServer) HandlerDeleteEvent(w http.ResponseWriter, r *http.Request
 
 func (ss *StoreServer) HandlerEventsForDay(w http.ResponseWriter, r *http.Request) {
 
-	date := HandlerDataGet(r)
+	date := handlerDataGet(r)
 
 	events, err := ss.store.EventsForDay(date, 0)
 	if err != nil {
@@ -71,7 +71,7 @@ func (ss *StoreServer) HandlerEventsForDay(w http.ResponseWriter, r *http.Reques
 }
 
 func (ss *StoreServer) HandlerEventsForWeek(w http.ResponseWriter, r *http.Request) {
-	date := HandlerDataGet(r)
+	date := handlerDataGet(r)
 
 	events, err := ss.store.EventsForDay(date, 7)
 	if err != nil {
@@ -83,7 +83,7 @@ func (ss *StoreServer) HandlerEventsForWeek(w http.ResponseWriter, r *http.Reque
 }
 
 func (ss *StoreServer) HandlerEventsForMonth(w http.ResponseWriter, r *http.Request) {
-	date := HandlerDataGet(r)
+	date := handlerDataGet(r)
 
 	events, err := ss.store.EventsForDay(date, 30)
 	if err != nil {
@@ -94,7 +94,7 @@ func (ss *StoreServer) HandlerEventsForMonth(w http.ResponseWriter, r *http.Requ
 	RenderJSON(w, events)
 }
 
-func HandlerDataPost(r *http.Request) (int, time.Time, string, error) {
+func handlerDataPost(r *http.Request) (int, time.Time, string, error) {
 	var id int
 	var date time.Time
 	var mes string
@@ -125,7 +125,7 @@ func HandlerDataPost(r *http.Request) (int, time.Time, string, error) {
 	return id, date, mes, nil
 }
 
-func HandlerDataGet(r *http.Request) time.Time {
+func handlerDataGet(r *http.Request) time.Time {
 
 	dateF := r.FormValue("date") + "T00:00:00Z"
 	date, err := time.Parse(time.RFC3339, dateF)

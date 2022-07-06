@@ -21,7 +21,7 @@ func configureRoutes(serveMux *http.ServeMux, storeServer *handler.StoreServer) 
 func main() {
 
 	serveMux := http.NewServeMux()
-	store := service.NewStore(sync.Mutex{}, make(map[int]service.EventCalendar))
+	store := service.NewStore(&sync.Mutex{}, make(map[int]service.EventCalendar))
 	storeServer := handler.NewStoreServer(store)
 	configureRoutes(serveMux, storeServer)
 
@@ -29,7 +29,7 @@ func main() {
 		http.ServeFile(w, r, "./tmpl/index.html")
 	})
 
-	handler := middleware.Logging(serveMux)
+	login := middleware.Logging(serveMux)
 
-	log.Fatal(http.ListenAndServe("localhost:8081", handler))
+	log.Fatal(http.ListenAndServe("localhost:8081", login))
 }

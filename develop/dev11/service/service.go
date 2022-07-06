@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func NewStore(m sync.Mutex, store map[int]EventCalendar) *StoreServer {
+func NewStore(m *sync.Mutex, store map[int]EventCalendar) *StoreServer {
 	return &StoreServer{m: m, store: store}
 }
 

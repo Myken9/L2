@@ -11,6 +11,6 @@ type EventCalendar struct {
 }
 
 type StoreServer struct {
-	m     sync.Mutex
+	m     *sync.Mutex
 	store map[int]EventCalendar
 }
