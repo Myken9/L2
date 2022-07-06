@@ -3,8 +3,10 @@ package main
 import (
 	"dev11/handler"
 	"dev11/middleware"
+	"dev11/service"
 	"log"
 	"net/http"
+	"sync"
 )
 
 func configureRoutes(serveMux *http.ServeMux, storeServer *handler.StoreServer) {
@@ -19,7 +21,8 @@ func configureRoutes(serveMux *http.ServeMux, storeServer *handler.StoreServer) 
 func main() {
 
 	serveMux := http.NewServeMux()
-	storeServer := handler.NewStoreServer()
+	store := service.NewStore(sync.Mutex{}, make(map[int]service.EventCalendar))
+	storeServer := handler.NewStoreServer(store)
 	configureRoutes(serveMux, storeServer)
 
 	serveMux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {

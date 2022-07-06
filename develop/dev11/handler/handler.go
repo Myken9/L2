@@ -10,8 +10,7 @@ import (
 	"time"
 )
 
-func NewStoreServer() *StoreServer {
-	store := service.NewStore()
+func NewStoreServer(store *service.StoreServer) *StoreServer {
 	return &StoreServer{store: store}
 }
 

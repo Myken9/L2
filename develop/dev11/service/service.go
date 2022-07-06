@@ -7,11 +7,8 @@ import (
 	"time"
 )
 
-func NewStore() *StoreServer {
-	ss := &StoreServer{}
-	ss.m = sync.Mutex{}
-	ss.store = make(map[int]EventCalendar)
-	return ss
+func NewStore(m sync.Mutex, store map[int]EventCalendar) *StoreServer {
+	return &StoreServer{m: m, store: store}
 }
 
 func (ss *StoreServer) CreateEvent(date time.Time, mes string) int {
